@@ -28,11 +28,14 @@ import { FlashProvider, DynamicPluginProvider } from 'src/components';
 import { EmbeddedUiConfigProvider } from 'src/components/UiConfigContext';
 import { SupersetThemeProvider } from 'src/theme/ThemeProvider';
 import { ThemeController } from 'src/theme/ThemeController';
+import { ThemeMode } from '@superset-ui/core';
 import { store } from './store';
 import '../preamble';
 
 const { common } = getBootstrapData();
 const themeController = new ThemeController();
+
+themeController.setThemeMode(ThemeMode.DEFAULT);
 const extensionsRegistry = getExtensionsRegistry();
 
 export const RootContextProviders: React.FC = ({ children }) => {
