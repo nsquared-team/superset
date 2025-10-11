@@ -41,6 +41,7 @@ import { logEvent } from 'src/logger/actions';
 import { store } from 'src/views/store';
 import { RootContextProviders } from './RootContextProviders';
 import { ScrollToTop } from './ScrollToTop';
+import GlobalStyles from 'src/globalStyles';
 
 setupApp();
 setupPlugins();
@@ -84,6 +85,7 @@ const App = () => (
           <Route path={path} key={path}>
             <Suspense fallback={<Fallback />}>
               <Layout>
+                <GlobalStyles />
                 <Layout.Content
                   css={css`
                     display: flex;
