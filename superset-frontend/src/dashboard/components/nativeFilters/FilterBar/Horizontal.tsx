@@ -63,6 +63,15 @@ const FilterBarEmptyStateContainer = styled.div`
   `}
 `;
 
+const FilterLabel = styled.div`
+  ${({ theme }) => `
+    font-size: ${theme.fontSizeLG}px;
+    font-weight: ${theme.fontWeightStrong};
+    color: ${theme.colorTextSecondary};
+    padding: 0 ${theme.sizeUnit}px;
+  `}
+`;
+
 const HorizontalFilterBar: FC<HorizontalBarProps> = ({
   actions,
   dataMaskSelected,
@@ -106,12 +115,15 @@ const HorizontalFilterBar: FC<HorizontalBarProps> = ({
               </FilterBarEmptyStateContainer>
             )}
             {hasFilters && (
-              <FilterControls
-                dataMaskSelected={dataMaskSelected}
-                onFilterSelectionChange={onSelectionChange}
-                clearAllTriggers={clearAllTriggers}
-                onClearAllComplete={onClearAllComplete}
-              />
+              <>
+                <FilterLabel>Filters</FilterLabel>
+                <FilterControls
+                  dataMaskSelected={dataMaskSelected}
+                  onFilterSelectionChange={onSelectionChange}
+                  clearAllTriggers={clearAllTriggers}
+                  onClearAllComplete={onClearAllComplete}
+                />
+              </>
             )}
             {actions}
           </>
