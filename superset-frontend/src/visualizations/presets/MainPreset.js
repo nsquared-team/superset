@@ -72,6 +72,7 @@ import {
 } from '@superset-ui/plugin-chart-echarts';
 import {
   SelectFilterPlugin,
+  CheckboxFilterPlugin,
   RangeFilterPlugin,
   TimeFilterPlugin,
   TimeColumnFilterPlugin,
@@ -166,6 +167,7 @@ export default class MainPreset extends Preset {
         new EchartsHeatmapChartPlugin().configure({ key: VizType.Heatmap }),
         new EchartsHistogramChartPlugin().configure({ key: VizType.Histogram }),
         new SelectFilterPlugin().configure({ key: FilterPlugins.Select }),
+        new CheckboxFilterPlugin().configure({ key: FilterPlugins.Checkbox }),
         new RangeFilterPlugin().configure({ key: FilterPlugins.Range }),
         new TimeFilterPlugin().configure({ key: FilterPlugins.Time }),
         new TimeColumnFilterPlugin().configure({
