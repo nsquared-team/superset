@@ -137,6 +137,18 @@ export default function GlobalStyles() {
         .superset-19ooo9m:has(.superset-bfu8z5) .superset-t22g9u .grid-container {
           margin: 24px 10px 24px 32px !important;
         }
+
+        .superset-button.superset-button-secondary.superset-1a84gsj {
+          background-color: #f5f5f5 !important;
+          color: #000000A6 !important;
+          transition: background 0.2s !important;
+        }
+        .superset-button.superset-button-secondary.superset-1a84gsj sup{
+          background-color: #000000A6 !important;
+        }
+        .superset-button.superset-button-secondary.superset-1a84gsj:hover {
+          background-color: #f4f4f4 !important;
+        }
       `}
     />
   );
