@@ -76,6 +76,7 @@ import {
   TimeFilterPlugin,
   TimeColumnFilterPlugin,
   TimeGrainFilterPlugin,
+  FilterCheckboxPlugin,
 } from 'src/filters/components';
 import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/plugin-chart-pivot-table';
 import { HandlebarsChartPlugin } from '@superset-ui/plugin-chart-handlebars';
@@ -174,6 +175,7 @@ export default class MainPreset extends Preset {
         new TimeGrainFilterPlugin().configure({
           key: FilterPlugins.TimeGrain,
         }),
+        new FilterCheckboxPlugin().configure({ key: FilterPlugins.Checkbox }),
         new EchartsTreeChartPlugin().configure({ key: VizType.Tree }),
         new EchartsSunburstChartPlugin().configure({ key: VizType.Sunburst }),
         new HandlebarsChartPlugin().configure({ key: VizType.Handlebars }),
