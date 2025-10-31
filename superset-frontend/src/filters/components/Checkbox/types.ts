@@ -20,10 +20,6 @@ export interface PluginFilterCheckboxCustomizeProps {
   defaultToFirstItem: boolean;
   sortAscending?: boolean;
   sortMetric?: string;
-  singleBooleanMode?: boolean;
-  booleanFilterValue?: boolean;
-  useFilterNameAsLabel?: boolean;
-  hideFilterTitle?: boolean;
 }
 
 export const DEFAULT_FORM_DATA: PluginFilterCheckboxCustomizeProps = {
@@ -32,17 +28,11 @@ export const DEFAULT_FORM_DATA: PluginFilterCheckboxCustomizeProps = {
   inverseSelection: false,
   defaultToFirstItem: false,
   sortAscending: true,
-  singleBooleanMode: false,
-  booleanFilterValue: true,
-  useFilterNameAsLabel: false,
-  hideFilterTitle: false,
 };
 
 export type PluginFilterCheckboxQueryFormData = QueryFormData &
   PluginFilterStylesProps &
-  PluginFilterCheckboxCustomizeProps & {
-    filterName?: string;
-  };
+  PluginFilterCheckboxCustomizeProps;
 
 export interface PluginFilterCheckboxChartProps extends ChartProps {
   queriesData: ChartDataResponseResult[];

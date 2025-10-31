@@ -52,15 +52,7 @@ export default function PluginFilterCheckbox(props: PluginFilterCheckboxProps) {
     clearAllTrigger,
     onClearAllComplete,
   } = props;
-  const {
-    enableEmptyFilter,
-    inverseSelection,
-    defaultToFirstItem,
-    singleBooleanMode,
-    booleanFilterValue,
-    useFilterNameAsLabel,
-    filterName,
-  } = formData;
+  const { enableEmptyFilter, inverseSelection, defaultToFirstItem } = formData;
 
   const groupby = useMemo(
     () => ensureIsArray(formData.groupby).map(getColumnLabel),
@@ -82,51 +74,23 @@ export default function PluginFilterCheckbox(props: PluginFilterCheckboxProps) {
     appSection === AppSection.FilterConfigModal && defaultToFirstItem;
 
   const updateDataMask = useCallback(
-    (values: CheckboxValue, isSingleBoolean = false) => {
-      // Show all when no values are selected
-      if (singleBooleanMode && isSingleBoolean && (!values || !values.length)) {
-        setDataMask({
-          extraFormData: {},
-          filterState: {
-            label: undefined,
-            value: values,
-            excludeFilterValues,
-          },
-        });
-        return;
-      }
-
+    (values: CheckboxValue) => {
       const emptyFilter =
         enableEmptyFilter && !inverseSelection && !values?.length;
 
       const suffix = inverseSelection && values?.length ? t(' (excluded)') : '';
 
-      // Convert string true/false to boolean
-      const processedValues = singleBooleanMode
-        ? values?.map(val => {
-            if (val === 'true') return true;
-            if (val === 'false') return false;
-            return val;
-          })
-        : values;
-
       setDataMask({
         extraFormData: getSelectExtraFormData(
           col,
-          processedValues,
+          values,
           emptyFilter,
           excludeFilterValues && inverseSelection,
         ),
         filterState: {
           label: values?.length
             ? `${values
-                .map(value =>
-                  singleBooleanMode
-                    ? value === 'true'
-                      ? t('True')
-                      : t('False')
-                    : labelFormatter(value, datatype),
-                )
+                .map(value => labelFormatter(value, datatype))
                 .join(', ')}${suffix}`
             : undefined,
           value:
@@ -147,31 +111,15 @@ export default function PluginFilterCheckbox(props: PluginFilterCheckboxProps) {
       excludeFilterValues,
       labelFormatter,
       setDataMask,
-      singleBooleanMode,
     ],
   );
 
   const handleChange = useCallback(
     (checkedValues: unknown[]) => {
       const values = checkedValues as CheckboxValue;
-      updateDataMask(values?.length ? values : null, false);
+      updateDataMask(values?.length ? values : null);
     },
     [updateDataMask],
-  );
-
-  const handleSingleBooleanChange = useCallback(
-    (e: any) => {
-      const isChecked = e.target.checked;
-      if (isChecked) {
-        updateDataMask(
-          [booleanFilterValue ? 'false' : 'true'],
-          true,
-        );
-      } else {
-        updateDataMask(null, true);
-      }
-    },
-    [updateDataMask, booleanFilterValue],
   );
 
   const uniqueOptions = useMemo(() => {
@@ -197,31 +145,20 @@ export default function PluginFilterCheckbox(props: PluginFilterCheckboxProps) {
     });
   }, [uniqueOptions, formData.sortAscending]);
 
-  const singleBooleanChecked = useMemo(() => {
-    if (!singleBooleanMode) return false;
-    const value = filterState.value as CheckboxValue;
-    return !!(value && value.length > 0);
-  }, [singleBooleanMode, filterState.value]);
-
   useEffect(() => {
     if (clearAllTrigger) {
-      updateDataMask(null, singleBooleanMode);
+      updateDataMask(null);
       onClearAllComplete?.(formData.nativeFilterId);
       return;
     }
 
     if (isDisabled) {
-      updateDataMask(null, singleBooleanMode);
+      updateDataMask(null);
       return;
     }
 
     if (filterState.value !== undefined) {
-      updateDataMask(filterState.value, singleBooleanMode);
-      return;
-    }
-
-    if (singleBooleanMode) {
-      updateDataMask(null, false);
+      updateDataMask(filterState.value);
       return;
     }
 
@@ -235,7 +172,7 @@ export default function PluginFilterCheckbox(props: PluginFilterCheckboxProps) {
     } else if (formData?.defaultValue) {
       updateDataMask(formData.defaultValue);
     }
-  }, [isDisabled, defaultToFirstItem, clearAllTrigger, singleBooleanMode]);
+  }, [isDisabled, defaultToFirstItem, clearAllTrigger]);
 
   return (
     <FilterPluginStyle height={height} width={width}>
@@ -256,38 +193,20 @@ export default function PluginFilterCheckbox(props: PluginFilterCheckboxProps) {
           onBlur={unsetFocusedFilter}
           ref={inputRef}
         >
-          {singleBooleanMode ? (
-            <Checkbox
-              checked={singleBooleanChecked}
-              disabled={isDisabled || isRefreshing}
-              onChange={handleSingleBooleanChange}
-            >
-              {useFilterNameAsLabel && filterName
-                ? filterName
-                : booleanFilterValue
-                  ? t('False')
-                  : t('True')}
-            </Checkbox>
-          ) : (
-            <StyledCheckboxGroup
-              appSection={appSection}
-              inverseSelection={inverseSelection}
-              orientation={filterBarOrientation}
-              value={(filterState.value as CheckboxValue) || []}
-              disabled={isDisabled || isRefreshing}
-              onChange={handleChange}
-            >
-              {sortedOptions.map(option => (
-                <Checkbox key={option.value} value={option.value}>
-                  {useFilterNameAsLabel &&
-                  filterName &&
-                  sortedOptions.length === 1
-                    ? filterName
-                    : option.label}
-                </Checkbox>
-              ))}
-            </StyledCheckboxGroup>
-          )}
+          <StyledCheckboxGroup
+            appSection={appSection}
+            inverseSelection={inverseSelection}
+            orientation={filterBarOrientation}
+            value={(filterState.value as CheckboxValue) || []}
+            disabled={isDisabled || isRefreshing}
+            onChange={handleChange}
+          >
+            {sortedOptions.map(option => (
+              <Checkbox key={option.value} value={option.value}>
+                {option.label}
+              </Checkbox>
+            ))}
+          </StyledCheckboxGroup>
         </div>
       </FormItem>
     </FilterPluginStyle>
