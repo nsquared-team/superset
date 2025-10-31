@@ -303,6 +303,7 @@ const FilterControl = ({
   const validateStatus = isMissingRequiredValue ? 'error' : undefined;
   const isRequired = !!filter.controlValues?.enableEmptyFilter;
   const inverseSelection = !!filter.controlValues?.inverseSelection;
+  const hideFilterTitle = !!filter.controlValues?.hideFilterTitle;
 
   const {
     FilterControlContainer,
@@ -313,21 +314,23 @@ const FilterControl = ({
 
   const label = useMemo(
     () => (
-      <FilterControlTitleBox>
-        <FilterControlTitle
-          id={`filter-name-${filter.id}`}
-          data-test="filter-control-name"
-        >
-          {name}
-        </FilterControlTitle>
-        {isRequired && <RequiredFieldIndicator />}
-        {filter.description?.trim() && (
-          <DescriptionToolTip description={filter.description} />
-        )}
-        <FilterStyledIcon data-test="filter-icon">{icon}</FilterStyledIcon>
-      </FilterControlTitleBox>
-    ),
+      hideFilterTitle ? null : (
+        <FilterControlTitleBox>
+          <FilterControlTitle
+            id={`filter-name-${filter.id}`}
+            data-test="filter-control-name"
+          >
+            {name}
+          </FilterControlTitle>
+          {isRequired && <RequiredFieldIndicator />}
+          {filter.description?.trim() && (
+            <DescriptionToolTip description={filter.description} />
+          )}
+          <FilterStyledIcon data-test="filter-icon">{icon}</FilterStyledIcon>
+        </FilterControlTitleBox>
+      )),
     [
+      hideFilterTitle,
       FilterControlTitleBox,
       FilterControlTitle,
       name,
