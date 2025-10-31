@@ -154,12 +154,20 @@ export default function getControlItemsMap({
         checked: initialValue,
       };
     });
+  const currentFormData = form.getFieldValue(['filters', filterId, 'controlValues']) || {};
+  
   controlItems
     .filter(
-      (controlItem: CustomControlItem) =>
-        controlItem?.config?.renderTrigger &&
-        controlItem.name !== 'sortAscending' &&
-        controlItem.name !== 'enableSingleValue',
+      (controlItem: CustomControlItem) => {
+        if (!controlItem?.config?.renderTrigger) return false;
+        if (controlItem.name === 'sortAscending' || controlItem.name === 'enableSingleValue') return false;
+        
+        if (controlItem.config.visibility) {
+          return controlItem.config.visibility({ form_data: currentFormData } as any, {});
+        }
+        
+        return true;
+      },
     )
     .forEach(controlItem => {
       const initialValue =
