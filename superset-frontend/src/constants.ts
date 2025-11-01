@@ -183,6 +183,8 @@ export enum FilterPlugins {
   Time = 'filter_time',
   TimeColumn = 'filter_timecolumn',
   TimeGrain = 'filter_timegrain',
+  Checkbox = 'filter_checkbox',
+  Boolean = 'filter_boolean',
 }
 
 export enum Actions {
