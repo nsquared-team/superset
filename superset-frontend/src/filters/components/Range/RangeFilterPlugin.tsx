@@ -42,13 +42,13 @@ import { SingleValueType } from './SingleValueType';
 type InputValue = number | null;
 type RangeValue = [InputValue, InputValue];
 
-const StyledDivider = styled.span`
-  margin: 0 ${({ theme }) => theme.sizeUnit * 3}px;
-  color: ${({ theme }) => theme.colorSplit};
-  font-weight: ${({ theme }) => theme.fontWeightStrong};
-  font-size: ${({ theme }) => theme.fontSize}px;
-  align-content: center;
-`;
+// const StyledDivider = styled.span`
+//   margin: 0 ${({ theme }) => theme.sizeUnit * 3}px;
+//   color: ${({ theme }) => theme.colorSplit};
+//   font-weight: ${({ theme }) => theme.fontWeightStrong};
+//   font-size: ${({ theme }) => theme.fontSize}px;
+//   align-content: center;
+// `;
 
 const Wrapper = styled.div`
   display: flex;
@@ -102,8 +102,8 @@ const HorizontalLayout = styled.div`
     }
 
     .inputs-container {
-      min-width: 160px;
-      max-width: 200px;
+      min-width: 60px;
+      max-width: 100px;
     }
   `}
 `;
@@ -117,6 +117,17 @@ const FocusContainer = styled.div`
   }
   &:focus-visible {
     outline: none;
+  }
+  .range-filter-inputs {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: ${theme.sizeUnit * 4}px;
+  }
+
+  .range-filter-inputs input {
+    width: 100%;
   }`}
 `;
 
@@ -575,7 +586,7 @@ export default function RangeFilterPlugin(props: PluginFilterRangeProps) {
     );
   };
 
-  const renderInputs = () => (
+  const renderLeftInput = () => (
     <Wrapper
       tabIndex={-1}
       onFocus={setFocusedFilter}
@@ -600,8 +611,20 @@ export default function RangeFilterPlugin(props: PluginFilterRangeProps) {
         />
       )}
 
-      {enableSingleValue === undefined && <StyledDivider>-</StyledDivider>}
+      {/* {enableSingleValue === undefined && <StyledDivider>-</StyledDivider>} */}
+    </Wrapper>
+  );
 
+  const renderRightInput = () => (
+    <Wrapper
+      tabIndex={-1}
+      onFocus={setFocusedFilter}
+      onBlur={unsetFocusedFilter}
+      onMouseEnter={setHoveredFilter}
+      onMouseLeave={unsetHoveredFilter}
+      onMouseDown={() => setFilterActive(true)}
+      onMouseUp={() => setFilterActive(false)}
+    >
       {(enableSingleValue === undefined ||
         enableSingleValue === SingleValueType.Maximum) && (
         <InputNumber
@@ -617,6 +640,13 @@ export default function RangeFilterPlugin(props: PluginFilterRangeProps) {
     </Wrapper>
   );
 
+  const renderInputs = () => (
+    <div className="range-filter-inputs">
+      {renderLeftInput()}
+      {renderRightInput()}
+    </div>
+  );
+
   return (
     <FilterPluginStyle height={height} width={width}>
       {Number.isNaN(Number(min)) || Number.isNaN(Number(max)) ? (
@@ -628,6 +658,10 @@ export default function RangeFilterPlugin(props: PluginFilterRangeProps) {
             <FocusContainer ref={inputRef} tabIndex={-1}>
               <HorizontalLayout>
                 <InfoTooltip />
+                {(rangeDisplayMode === RangeDisplayMode.Input ||
+                  rangeDisplayMode === RangeDisplayMode.SliderAndInput) && (
+                  <div className="inputs-container">{renderLeftInput()}</div>
+                )}
                 {(rangeDisplayMode === RangeDisplayMode.Slider ||
                   rangeDisplayMode === RangeDisplayMode.SliderAndInput) && (
                   <div className="slider-wrapper">
@@ -636,7 +670,7 @@ export default function RangeFilterPlugin(props: PluginFilterRangeProps) {
                 )}
                 {(rangeDisplayMode === RangeDisplayMode.Input ||
                   rangeDisplayMode === RangeDisplayMode.SliderAndInput) && (
-                  <div className="inputs-container">{renderInputs()}</div>
+                  <div className="inputs-container">{renderRightInput()}</div>
                 )}
               </HorizontalLayout>
             </FocusContainer>
