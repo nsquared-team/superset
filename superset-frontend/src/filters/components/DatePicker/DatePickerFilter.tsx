@@ -16,13 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import {
-  styled,
-  NO_TIME_RANGE,
-  getExtensionsRegistry,
-} from '@superset-ui/core';
-import { useCallback, useEffect } from 'react';
-import DateFilterControl from 'src/explore/components/controls/DateFilterControl';
+import { styled, NO_TIME_RANGE } from '@superset-ui/core';
+import { useCallback, useEffect, useState } from 'react';
+import { DatePicker, AntdThemeProvider } from '@superset-ui/core/components';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { PluginFilterTimeProps } from './types';
 import { FilterPluginStyle } from '../common';
 
@@ -43,8 +41,11 @@ const ControlContainer = styled.div<{
   height: 100%;
   max-width: 100%;
   width: 100%;
-  & > div,
-  & > div:hover {
+
+  & .ant-picker {
+    width: 100%;
+    border-radius: ${({ theme }) => theme.borderRadius};
+
     ${({ validateStatus, theme }) => {
       if (!validateStatus) return '';
       switch (validateStatus) {
@@ -59,11 +60,13 @@ const ControlContainer = styled.div<{
       }
     }}
   }
-  & > div {
-    width: 100%;
+
+  & .ant-picker:hover,
+  & .ant-picker-focused {
+    border-color: ${({ theme }) => theme.colorPrimary};
   }
 
-  &:focus > div {
+  &:focus-within .ant-picker {
     border-color: ${({ theme }) => theme.colorPrimary};
     box-shadow: ${({ theme }) => `0 0 0 2px ${theme.controlOutline}`};
     outline: 0;
@@ -82,60 +85,81 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
     height,
     filterState,
     inputRef,
-    isOverflowingFilterBar = false,
   } = props;
-  const extensionsRegistry = getExtensionsRegistry();
 
-  const DateFilterControlExtension = extensionsRegistry.get(
-    'filter.dateFilterControl',
-  );
-  const DateFilterComponent = DateFilterControlExtension ?? DateFilterControl;
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
 
-  const handleTimeRangeChange = useCallback(
-    (timeRange?: string): void => {
-      const isSet = timeRange && timeRange !== NO_TIME_RANGE;
-      setDataMask({
-        extraFormData: isSet
-          ? {
-              time_range: timeRange,
-            }
-          : {},
-        filterState: {
-          value: isSet ? timeRange : undefined,
-        },
-      });
+  useEffect(() => {
+    if (filterState.value && filterState.value !== NO_TIME_RANGE) {
+      const parts = filterState.value.split(' : ');
+      if (parts.length === 2) {
+        const endDate = parts[1].trim();
+        const parsedDate = dayjs(endDate);
+        if (parsedDate.isValid()) {
+          // Subtract 1 day since we added 1 day when saving
+          setSelectedDate(parsedDate.subtract(1, 'day'));
+        }
+      }
+    }
+  }, []);
+
+  const handleDateChange = useCallback(
+    (date: Dayjs | null): void => {
+      setSelectedDate(date);
+
+      if (date) {
+        const endDate = date.add(1, 'day').format('YYYY-MM-DD');
+        const timeRange = `1900-01-01 : ${endDate}`;
+
+        setDataMask({
+          extraFormData: {
+            time_range: timeRange,
+          },
+          filterState: {
+            value: timeRange,
+          },
+        });
+      } else {
+        setDataMask({
+          extraFormData: {},
+          filterState: {
+            value: undefined,
+          },
+        });
+      }
     },
     [setDataMask],
   );
 
-  useEffect(() => {
-    handleTimeRangeChange(filterState.value);
-  }, [filterState.value]);
-
   return props.formData?.inView ? (
-    <TimeFilterStyles width={width} height={height}>
-      <ControlContainer
-        ref={inputRef}
-        validateStatus={filterState.validateStatus}
-        onFocus={setFocusedFilter}
-        onBlur={unsetFocusedFilter}
-        onMouseEnter={setHoveredFilter}
-        onMouseLeave={unsetHoveredFilter}
-        tabIndex={-1}
-      >
-        <DateFilterComponent
-          value={filterState.value || NO_TIME_RANGE}
-          name={props.formData.nativeFilterId || 'time_range'}
-          onChange={handleTimeRangeChange}
-          onOpenPopover={() => setFilterActive(true)}
-          onClosePopover={() => {
-            setFilterActive(false);
-            unsetHoveredFilter();
-            unsetFocusedFilter();
-          }}
-          isOverflowingFilterBar={isOverflowingFilterBar}
-        />
-      </ControlContainer>
-    </TimeFilterStyles>
+    <AntdThemeProvider>
+      <TimeFilterStyles width={width} height={height}>
+        <ControlContainer
+          ref={inputRef}
+          validateStatus={filterState.validateStatus}
+          onFocus={setFocusedFilter}
+          onBlur={unsetFocusedFilter}
+          onMouseEnter={setHoveredFilter}
+          onMouseLeave={unsetHoveredFilter}
+          tabIndex={-1}
+        >
+          <DatePicker
+            value={selectedDate}
+            onChange={handleDateChange}
+            placeholder="Select a date"
+            format="YYYY-MM-DD"
+            allowClear
+            onOpenChange={open => {
+              setFilterActive(open);
+              if (!open) {
+                unsetHoveredFilter();
+                unsetFocusedFilter();
+              }
+            }}
+            style={{ width: '100%' }}
+          />
+        </ControlContainer>
+      </TimeFilterStyles>
+    </AntdThemeProvider>
   ) : null;
 }
