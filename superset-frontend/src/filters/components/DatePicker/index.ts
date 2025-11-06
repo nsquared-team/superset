@@ -16,11 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-export { default as SelectFilterPlugin } from './Select';
-export { default as RangeFilterPlugin } from './Range';
-export { default as TimeFilterPlugin } from './Time';
-export { default as TimeColumnFilterPlugin } from './TimeColumn';
-export { default as TimeGrainFilterPlugin } from './TimeGrain';
-export { default as FilterCheckboxPlugin } from './Checkbox';
-export { default as FilterBooleanPlugin } from './Boolean';
-export { default as TimeDatePickerPlugin } from './DatePicker';
+import { Behavior, ChartMetadata, ChartPlugin, t } from '@superset-ui/core';
+import controlPanel from './controlPanel';
+import transformProps from './transformProps';
+import thumbnail from './images/thumbnail.png';
+
+export default class TimeDatePickerPlugin extends ChartPlugin {
+  constructor() {
+    const metadata = new ChartMetadata({
+      name: t('Date Picker'),
+      description: t('Date picker filter plugin'),
+      behaviors: [Behavior.InteractiveChart, Behavior.NativeFilter],
+      thumbnail,
+      tags: [t('Experimental')],
+      datasourceCount: 0,
+    });
+
+    super({
+      controlPanel,
+      loadChart: () => import('./DatePickerFilter'),
+      metadata,
+      transformProps,
+    });
+  }
+}
