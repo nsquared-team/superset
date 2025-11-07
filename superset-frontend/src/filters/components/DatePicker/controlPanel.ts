@@ -59,6 +59,20 @@ const config: ControlPanelConfig = {
             },
           },
         ],
+        [
+          {
+            name: 'singleDate',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Single date'),
+              default: false,
+              renderTrigger: true,
+              description: t(
+                'When enabled, the filter only applies to the selected date.',
+              ),
+            },
+          },
+        ],
       ],
     },
   ],

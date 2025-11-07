@@ -21,7 +21,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { DatePicker, AntdThemeProvider } from '@superset-ui/core/components';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { PluginFilterTimeProps } from './types';
+import { DEFAULT_FORM_DATA, PluginFilterTimeProps } from './types';
 import { FilterPluginStyle } from '../common';
 
 const TimeFilterStyles = styled(FilterPluginStyle)`
@@ -88,28 +88,44 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
   } = props;
 
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+  const singleDate =
+    props.formData?.singleDate ?? DEFAULT_FORM_DATA.singleDate;
 
   useEffect(() => {
     if (filterState.value && filterState.value !== NO_TIME_RANGE) {
       const parts = filterState.value.split(' : ');
       if (parts.length === 2) {
-        const endDate = parts[1].trim();
-        const parsedDate = dayjs(endDate);
-        if (parsedDate.isValid()) {
-          // Subtract 1 day since we added 1 day when saving
-          setSelectedDate(parsedDate.subtract(1, 'day'));
+        if (singleDate) {
+          const startDate = parts[0].trim();
+          const parsedStartDate = dayjs(startDate);
+          if (parsedStartDate.isValid()) {
+            setSelectedDate(parsedStartDate.startOf('day'));
+            return;
+          }
+        } else {
+          const endDate = parts[1].trim();
+          const parsedEndDate = dayjs(endDate);
+          if (parsedEndDate.isValid()) {
+            setSelectedDate(parsedEndDate.subtract(1, 'day').startOf('day'));
+            return;
+          }
         }
       }
     }
-  }, []);
+    setSelectedDate(null);
+  }, [filterState.value, singleDate]);
 
   const handleDateChange = useCallback(
     (date: Dayjs | null): void => {
-      setSelectedDate(date);
-
       if (date) {
-        const endDate = date.add(1, 'day').format('YYYY-MM-DD');
-        const timeRange = `1900-01-01 : ${endDate}`;
+        const normalizedDate = date.startOf('day');
+        setSelectedDate(normalizedDate);
+        const startDate = normalizedDate.format('YYYY-MM-DD');
+        const endDate = normalizedDate.add(1, 'day').format('YYYY-MM-DD');
+
+        const timeRange = singleDate
+          ? `${startDate} : ${endDate}`
+          : `1900-01-01 : ${endDate}`;
 
         setDataMask({
           extraFormData: {
@@ -120,6 +136,7 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
           },
         });
       } else {
+        setSelectedDate(null);
         setDataMask({
           extraFormData: {},
           filterState: {
@@ -128,7 +145,7 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
         });
       }
     },
-    [setDataMask],
+    [singleDate, setDataMask],
   );
 
   return props.formData?.inView ? (

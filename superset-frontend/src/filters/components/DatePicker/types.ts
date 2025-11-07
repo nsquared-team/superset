@@ -27,6 +27,7 @@ import { PluginFilterHooks, PluginFilterStylesProps } from '../types';
 
 interface PluginFilterTimeCustomizeProps {
   defaultValue?: string | null;
+  singleDate?: boolean;
 }
 
 export type PluginFilterSelectQueryFormData = QueryFormData &
@@ -44,4 +45,5 @@ export type PluginFilterTimeProps = PluginFilterStylesProps & {
 
 export const DEFAULT_FORM_DATA: PluginFilterTimeCustomizeProps = {
   defaultValue: null,
+  singleDate: false,
 };
