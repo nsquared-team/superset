@@ -20,7 +20,7 @@
 import { ReactNode } from 'react';
 import { css, Divider, Filter, SupersetTheme } from '@superset-ui/core';
 import { FilterBarOrientation } from 'src/dashboard/types';
-import { FiltersOutOfScopeCollapsible } from '../FiltersOutOfScopeCollapsible';
+// import { FiltersOutOfScopeCollapsible } from '../FiltersOutOfScopeCollapsible';
 import { CrossFilterIndicator } from '../../selectors';
 
 export interface FiltersDropdownContentProps {
@@ -60,12 +60,12 @@ export const FiltersDropdownContent = ({
       ),
     )}
     {filtersInScope.map(renderer)}
-    {showCollapsePanel && (
+    {/* {showCollapsePanel && (
       <FiltersOutOfScopeCollapsible
         filtersOutOfScope={filtersOutOfScope}
         renderer={renderer}
         forceRender={forceRenderOutOfScope}
       />
-    )}
+    )} */}
   </div>
 );
