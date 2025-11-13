@@ -21,7 +21,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { RangePicker, AntdThemeProvider } from '@superset-ui/core/components';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { DEFAULT_FORM_DATA, PluginFilterTimeProps } from './types';
+import { PluginFilterTimeProps } from './types';
 import { FilterPluginStyle } from '../common';
 
 const TimeFilterStyles = styled(FilterPluginStyle)`
@@ -87,45 +87,40 @@ export default function DateRangeFilter(props: PluginFilterTimeProps) {
     inputRef,
   } = props;
 
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
-  const singleDate =
-    props.formData?.singleDate ?? DEFAULT_FORM_DATA.singleDate;
+  const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([null, null]);
 
   useEffect(() => {
     if (filterState.value && filterState.value !== NO_TIME_RANGE) {
       const parts = filterState.value.split(' : ');
       if (parts.length === 2) {
-        if (singleDate) {
-          const startDate = parts[0].trim();
-          const parsedStartDate = dayjs(startDate);
-          if (parsedStartDate.isValid()) {
-            setSelectedDate(parsedStartDate.startOf('day'));
-            return;
-          }
-        } else {
-          const endDate = parts[1].trim();
-          const parsedEndDate = dayjs(endDate);
-          if (parsedEndDate.isValid()) {
-            setSelectedDate(parsedEndDate.subtract(1, 'day').startOf('day'));
-            return;
-          }
+        const startDate = parts[0].trim();
+        const endDate = parts[1].trim();
+        const parsedStartDate = dayjs(startDate);
+        const parsedEndDate = dayjs(endDate);
+
+        if (parsedStartDate.isValid() && parsedEndDate.isValid()) {
+          setDateRange([
+            parsedStartDate.startOf('day'),
+            parsedEndDate.subtract(1, 'day').startOf('day'),
+          ]);
+          return;
         }
       }
     }
-    setSelectedDate(null);
-  }, [filterState.value, singleDate]);
+    setDateRange([null, null]);
+  }, [filterState.value]);
 
   const handleDateChange = useCallback(
-    (date: Dayjs | null): void => {
-      if (date) {
-        const normalizedDate = date.startOf('day');
-        setSelectedDate(normalizedDate);
-        const startDate = normalizedDate.format('YYYY-MM-DD');
-        const endDate = normalizedDate.add(1, 'day').format('YYYY-MM-DD');
+    (dates: [Dayjs | null, Dayjs | null] | null): void => {
+      if (dates && dates[0] && dates[1]) {
+        const startDate = dates[0].startOf('day');
+        const endDate = dates[1].startOf('day');
+        setDateRange([startDate, endDate]);
 
-        const timeRange = singleDate
-          ? `${startDate} : ${endDate}`
-          : `1900-01-01 : ${endDate}`;
+        const formattedStartDate = startDate.format('YYYY-MM-DD');
+        const formattedEndDate = endDate.add(1, 'day').format('YYYY-MM-DD');
+
+        const timeRange = `${formattedStartDate} : ${formattedEndDate}`;
 
         setDataMask({
           extraFormData: {
@@ -136,7 +131,7 @@ export default function DateRangeFilter(props: PluginFilterTimeProps) {
           },
         });
       } else {
-        setSelectedDate(null);
+        setDateRange([null, null]);
         setDataMask({
           extraFormData: {},
           filterState: {
@@ -145,7 +140,7 @@ export default function DateRangeFilter(props: PluginFilterTimeProps) {
         });
       }
     },
-    [singleDate, setDataMask],
+    [setDataMask],
   );
 
   return props.formData?.inView ? (
@@ -161,12 +156,9 @@ export default function DateRangeFilter(props: PluginFilterTimeProps) {
           tabIndex={-1}
         >
           <RangePicker
-            value={[selectedDate, selectedDate ?? null]}
-            onChange={(dates: [Dayjs | null, Dayjs | null]) => {
-              handleDateChange(dates[0]);
-              handleDateChange(dates[1]);
-            }}
-            placeholder={['Select a date', 'Select a date']}
+            value={dateRange}
+            onChange={handleDateChange}
+            placeholder={['Start date', 'End date']}
             format="YYYY-MM-DD"
             allowClear
             onOpenChange={open => {
