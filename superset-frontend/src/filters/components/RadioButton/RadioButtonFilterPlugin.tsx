@@ -12,7 +12,7 @@ import { FormItem, Checkbox } from '@superset-ui/core/components';
 import { FilterBarOrientation } from 'src/dashboard/types';
 import { getDataRecordFormatter, getSelectExtraFormData } from '../../utils';
 import { FilterPluginStyle, StatusMessage } from '../common';
-import { PluginFilterCheckboxProps, CheckboxValue } from './types';
+import { PluginFilterRadioButtonProps, RadioButtonValue } from './types';
 
 const StyledCheckboxGroup = styled(Checkbox.Group)<{
   inverseSelection: boolean;
@@ -32,7 +32,7 @@ const StyledCheckboxGroup = styled(Checkbox.Group)<{
   }
 `;
 
-export default function PluginFilterCheckbox(props: PluginFilterCheckboxProps) {
+export default function PluginFilterRadioButton(props: PluginFilterRadioButtonProps) {
   const {
     coltypeMap,
     data,
@@ -74,7 +74,7 @@ export default function PluginFilterCheckbox(props: PluginFilterCheckboxProps) {
     appSection === AppSection.FilterConfigModal && defaultToFirstItem;
 
   const updateDataMask = useCallback(
-    (values: CheckboxValue) => {
+    (values: RadioButtonValue) => {
       const emptyFilter =
         enableEmptyFilter && !inverseSelection && !values?.length;
 
@@ -115,8 +115,8 @@ export default function PluginFilterCheckbox(props: PluginFilterCheckboxProps) {
   );
 
   const handleChange = useCallback(
-    (checkedValues: unknown[]) => {
-      const values = checkedValues as CheckboxValue;
+    (selectedValues: unknown[]) => {
+      const values = selectedValues as RadioButtonValue;
       updateDataMask(values?.length ? values : null);
     },
     [updateDataMask],
@@ -163,7 +163,7 @@ export default function PluginFilterCheckbox(props: PluginFilterCheckboxProps) {
     }
 
     if (defaultToFirstItem && data[0]) {
-      const firstItem: CheckboxValue = groupby.map(
+      const firstItem: RadioButtonValue = groupby.map(
         col => data[0][col],
       ) as string[];
       if (firstItem?.[0] !== undefined) {
@@ -197,7 +197,7 @@ export default function PluginFilterCheckbox(props: PluginFilterCheckboxProps) {
             appSection={appSection}
             inverseSelection={inverseSelection}
             orientation={filterBarOrientation}
-            value={(filterState.value as CheckboxValue) || []}
+            value={(filterState.value as RadioButtonValue) || []}
             disabled={isDisabled || isRefreshing}
             onChange={handleChange}
           >

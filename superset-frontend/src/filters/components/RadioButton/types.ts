@@ -11,10 +11,10 @@ import { RefObject } from 'react';
 import { FilterBarOrientation } from 'src/dashboard/types';
 import { PluginFilterHooks, PluginFilterStylesProps } from '../types';
 
-export type CheckboxValue = (number | string | null)[] | null | undefined;
+export type RadioButtonValue = (number | string | null)[] | null | undefined;
 
-export interface PluginFilterCheckboxCustomizeProps {
-  defaultValue?: CheckboxValue;
+export interface PluginFilterRadioButtonCustomizeProps {
+  defaultValue?: RadioButtonValue;
   enableEmptyFilter: boolean;
   inverseSelection: boolean;
   defaultToFirstItem: boolean;
@@ -22,7 +22,7 @@ export interface PluginFilterCheckboxCustomizeProps {
   sortMetric?: string;
 }
 
-export const DEFAULT_FORM_DATA: PluginFilterCheckboxCustomizeProps = {
+export const DEFAULT_FORM_DATA: PluginFilterRadioButtonCustomizeProps = {
   defaultValue: null,
   enableEmptyFilter: false,
   inverseSelection: false,
@@ -30,20 +30,20 @@ export const DEFAULT_FORM_DATA: PluginFilterCheckboxCustomizeProps = {
   sortAscending: true,
 };
 
-export type PluginFilterCheckboxQueryFormData = QueryFormData &
+export type PluginFilterRadioButtonQueryFormData = QueryFormData &
   PluginFilterStylesProps &
-  PluginFilterCheckboxCustomizeProps;
+  PluginFilterRadioButtonCustomizeProps;
 
-export interface PluginFilterCheckboxChartProps extends ChartProps {
+export interface PluginFilterRadioButtonChartProps extends ChartProps {
   queriesData: ChartDataResponseResult[];
 }
 
-export type PluginFilterCheckboxProps = PluginFilterStylesProps &
+export type PluginFilterRadioButtonProps = PluginFilterStylesProps &
   PluginFilterHooks & {
     coltypeMap: Record<string, GenericDataType>;
     data: DataRecord[];
     appSection: AppSection;
-    formData: PluginFilterCheckboxQueryFormData;
+    formData: PluginFilterRadioButtonQueryFormData;
     filterState: FilterState;
     isRefreshing: boolean;
     inputRef?: RefObject<HTMLDivElement>;

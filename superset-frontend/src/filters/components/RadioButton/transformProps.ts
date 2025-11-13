@@ -1,9 +1,9 @@
 import { GenericDataType } from '@superset-ui/core';
 import { noOp } from 'src/utils/common';
-import { DEFAULT_FORM_DATA, PluginFilterCheckboxChartProps } from './types';
+import { DEFAULT_FORM_DATA, PluginFilterRadioButtonChartProps } from './types';
 
 export default function transformProps(
-  chartProps: PluginFilterCheckboxChartProps,
+  chartProps: PluginFilterRadioButtonChartProps,
 ) {
   const {
     formData,

@@ -22,5 +22,6 @@ export { default as TimeFilterPlugin } from './Time';
 export { default as TimeColumnFilterPlugin } from './TimeColumn';
 export { default as TimeGrainFilterPlugin } from './TimeGrain';
 export { default as FilterCheckboxPlugin } from './Checkbox';
+export { default as FilterRadioButtonPlugin } from './RadioButton';
 export { default as FilterBooleanPlugin } from './Boolean';
 export { default as TimeDatePickerPlugin } from './DatePicker';

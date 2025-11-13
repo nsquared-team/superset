@@ -1,8 +1,8 @@
 import { buildQueryContext } from '@superset-ui/core';
-import { DEFAULT_FORM_DATA, PluginFilterCheckboxQueryFormData } from './types';
+import { DEFAULT_FORM_DATA, PluginFilterRadioButtonQueryFormData } from './types';
 
 export default function buildQuery(
-  formData: PluginFilterCheckboxQueryFormData,
+  formData: PluginFilterRadioButtonQueryFormData,
 ) {
   const { sortAscending, sortMetric } = { ...DEFAULT_FORM_DATA, ...formData };
   
