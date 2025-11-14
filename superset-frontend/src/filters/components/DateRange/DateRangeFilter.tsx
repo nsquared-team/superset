@@ -16,13 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { styled, NO_TIME_RANGE } from '@superset-ui/core';
-import { useCallback, useEffect, useState } from 'react';
+import { styled, NO_TIME_RANGE, t } from '@superset-ui/core';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { RangePicker, AntdThemeProvider } from '@superset-ui/core/components';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
+import quarterOfYear from 'dayjs/plugin/quarterOfYear';
 import { PluginFilterTimeProps } from './types';
 import { FilterPluginStyle } from '../common';
+
+dayjs.extend(quarterOfYear);
 
 const TimeFilterStyles = styled(FilterPluginStyle)`
   display: flex;
@@ -88,6 +91,74 @@ export default function DateRangeFilter(props: PluginFilterTimeProps) {
   } = props;
 
   const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([null, null]);
+
+  const rangePresets = useMemo(() => {
+    const today = dayjs().startOf('day');
+    return [
+      { label: t('Today'), value: [today, today] as [Dayjs, Dayjs] },
+      {
+        label: t('Yesterday'),
+        value: [today.subtract(1, 'day'), today.subtract(1, 'day')] as [Dayjs, Dayjs],
+      },
+      {
+        label: t('Last 7 Days'),
+        value: [today.subtract(6, 'day'), today] as [Dayjs, Dayjs],
+      },
+      {
+        label: t('Last 14 Days'),
+        value: [today.subtract(13, 'day'), today] as [Dayjs, Dayjs],
+      },
+      {
+        label: t('Last 28 Days'),
+        value: [today.subtract(27, 'day'), today] as [Dayjs, Dayjs],
+      },
+      {
+        label: t('Last 30 Days'),
+        value: [today.subtract(29, 'day'), today] as [Dayjs, Dayjs],
+      },
+      {
+        label: t('This Week'),
+        value: [today.startOf('week'), today.endOf('week')] as [Dayjs, Dayjs],
+      },
+      {
+        label: t('Last Week'),
+        value: [today.subtract(1, 'week').startOf('week'), today.subtract(1, 'week').endOf('week')] as [Dayjs, Dayjs],
+      },
+      {
+        label: t('This Month'),
+        value: [today.startOf('month'), today.endOf('month')] as [Dayjs, Dayjs],
+      },
+      {
+        label: t('Last Month'),
+        value: [
+          today.subtract(1, 'month').startOf('month'),
+          today.subtract(1, 'month').endOf('month'),
+        ] as [Dayjs, Dayjs],
+      },
+      {
+        label: t('This Quarter'),
+        value: [today.startOf('quarter'), today.endOf('quarter')] as [Dayjs, Dayjs],
+      },
+      {
+        label: t('Last Quarter'),
+        value: [
+          today.subtract(1, 'quarter').startOf('quarter'),
+          today.subtract(1, 'quarter').endOf('quarter'),
+        ] as [Dayjs, Dayjs],
+      },
+      {
+        label: t('This Year'),
+        value: [today.startOf('year'), today.endOf('year')] as [Dayjs, Dayjs],
+      },
+      {
+        label: t('Last Year'),
+        value: [
+          today.subtract(1, 'year').startOf('year'),
+          today.subtract(1, 'year').endOf('year'),
+        ] as [Dayjs, Dayjs],
+      },
+    ];
+  }, []);
 
   useEffect(() => {
     if (filterState.value && filterState.value !== NO_TIME_RANGE) {
@@ -161,6 +232,7 @@ export default function DateRangeFilter(props: PluginFilterTimeProps) {
             placeholder={['Start date', 'End date']}
             format="YYYY-MM-DD"
             allowClear
+            presets={props.formData?.disablePresets ? undefined : rangePresets}
             onOpenChange={open => {
               setFilterActive(open);
               if (!open) {

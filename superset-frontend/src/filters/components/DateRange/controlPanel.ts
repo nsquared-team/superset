@@ -59,6 +59,20 @@ const config: ControlPanelConfig = {
             },
           },
         ],
+        [
+          {
+            name: 'disablePresets',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Disable date presets'),
+              default: false,
+              renderTrigger: true,
+              description: t(
+                'Hide preset date ranges (Today, Last 7 Days, etc.) from the date picker',
+              ),
+            },
+          },
+        ],
       ],
     },
   ],
