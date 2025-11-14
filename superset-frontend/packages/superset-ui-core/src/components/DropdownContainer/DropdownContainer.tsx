@@ -303,7 +303,7 @@ export const DropdownContainer = forwardRef(
           css={css`
             display: flex;
             align-items: center;
-            gap: ${theme.sizeUnit * 4}px;
+            gap: ${theme.sizeUnit * 8}px;
             margin-right: ${theme.sizeUnit * 4}px;
             min-width: 0px;
           `}

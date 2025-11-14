@@ -179,7 +179,7 @@ const HorizontalFormItem = styled(StyledFormItem)<{
   }
 
   .ant-form-item-control {
-    min-width: ${({ inverseSelection }) => (inverseSelection ? 252 : 164)}px;
+    min-width: ${({ inverseSelection }) => (inverseSelection ? 252 : "fit-content")}px;
   }
 
   .select-container {
