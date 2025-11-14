@@ -18,9 +18,11 @@
  */
 import {
   ControlPanelConfig,
+  ControlPanelsContainerProps,
   sharedControls,
 } from '@superset-ui/chart-controls';
 import { t } from '@superset-ui/core';
+import { ALL_DATE_RANGE_PRESETS } from './types';
 
 const config: ControlPanelConfig = {
   // For control input types, see: superset-frontend/src/explore/components/controls/index.js
@@ -61,15 +63,51 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'disablePresets',
+            name: 'customPresets',
             config: {
               type: 'CheckboxControl',
-              label: t('Disable date presets'),
+              label: t('Customize date presets'),
               default: false,
               renderTrigger: true,
               description: t(
-                'Hide preset date ranges (Today, Last 7 Days, etc.) from the date picker',
+                'Enable to select which preset date ranges to show in the date picker',
               ),
+            },
+          },
+        ],
+        [
+          {
+            name: 'enabledPresets',
+            config: {
+              type: 'SelectControl',
+              label: t('Enabled presets'),
+              multi: true,
+              freeForm: false,
+              clearable: false,
+              default: ALL_DATE_RANGE_PRESETS,
+              mode: 'multiple',
+              choices: [
+                ['today', t('Today')],
+                ['yesterday', t('Yesterday')],
+                ['last_7_days', t('Last 7 Days')],
+                ['last_14_days', t('Last 14 Days')],
+                ['last_28_days', t('Last 28 Days')],
+                ['last_30_days', t('Last 30 Days')],
+                ['this_week', t('This Week')],
+                ['last_week', t('Last Week')],
+                ['this_month', t('This Month')],
+                ['last_month', t('Last Month')],
+                ['this_quarter', t('This Quarter')],
+                ['last_quarter', t('Last Quarter')],
+                ['this_year', t('This Year')],
+                ['last_year', t('Last Year')],
+              ],
+              renderTrigger: true,
+              description: t(
+                'Select which preset date ranges to display in the date picker',
+              ),
+              visibility: ({ controls }: ControlPanelsContainerProps) =>
+                Boolean(controls?.customPresets?.value),
             },
           },
         ],

@@ -22,7 +22,7 @@ import { RangePicker, AntdThemeProvider } from '@superset-ui/core/components';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear';
-import { PluginFilterTimeProps } from './types';
+import { PluginFilterTimeProps, DateRangePresetKey } from './types';
 import { FilterPluginStyle } from '../common';
 
 dayjs.extend(quarterOfYear);
@@ -92,73 +92,87 @@ export default function DateRangeFilter(props: PluginFilterTimeProps) {
 
   const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([null, null]);
 
-  const rangePresets = useMemo(() => {
+  const allRangePresets = useMemo(() => {
     const today = dayjs().startOf('day');
-    return [
-      { label: t('Today'), value: [today, today] as [Dayjs, Dayjs] },
-      {
+    return new Map<DateRangePresetKey, { label: string; value: [Dayjs, Dayjs] }>([
+      ['today', { label: t('Today'), value: [today, today] }],
+      ['yesterday', {
         label: t('Yesterday'),
-        value: [today.subtract(1, 'day'), today.subtract(1, 'day')] as [Dayjs, Dayjs],
-      },
-      {
+        value: [today.subtract(1, 'day'), today.subtract(1, 'day')],
+      }],
+      ['last_7_days', {
         label: t('Last 7 Days'),
-        value: [today.subtract(6, 'day'), today] as [Dayjs, Dayjs],
-      },
-      {
+        value: [today.subtract(6, 'day'), today],
+      }],
+      ['last_14_days', {
         label: t('Last 14 Days'),
-        value: [today.subtract(13, 'day'), today] as [Dayjs, Dayjs],
-      },
-      {
+        value: [today.subtract(13, 'day'), today],
+      }],
+      ['last_28_days', {
         label: t('Last 28 Days'),
-        value: [today.subtract(27, 'day'), today] as [Dayjs, Dayjs],
-      },
-      {
+        value: [today.subtract(27, 'day'), today],
+      }],
+      ['last_30_days', {
         label: t('Last 30 Days'),
-        value: [today.subtract(29, 'day'), today] as [Dayjs, Dayjs],
-      },
-      {
+        value: [today.subtract(29, 'day'), today],
+      }],
+      ['this_week', {
         label: t('This Week'),
-        value: [today.startOf('week'), today.endOf('week')] as [Dayjs, Dayjs],
-      },
-      {
+        value: [today.startOf('week'), today.endOf('week')],
+      }],
+      ['last_week', {
         label: t('Last Week'),
-        value: [today.subtract(1, 'week').startOf('week'), today.subtract(1, 'week').endOf('week')] as [Dayjs, Dayjs],
-      },
-      {
+        value: [today.subtract(1, 'week').startOf('week'), today.subtract(1, 'week').endOf('week')],
+      }],
+      ['this_month', {
         label: t('This Month'),
-        value: [today.startOf('month'), today.endOf('month')] as [Dayjs, Dayjs],
-      },
-      {
+        value: [today.startOf('month'), today.endOf('month')],
+      }],
+      ['last_month', {
         label: t('Last Month'),
         value: [
           today.subtract(1, 'month').startOf('month'),
           today.subtract(1, 'month').endOf('month'),
-        ] as [Dayjs, Dayjs],
-      },
-      {
+        ],
+      }],
+      ['this_quarter', {
         label: t('This Quarter'),
-        value: [today.startOf('quarter'), today.endOf('quarter')] as [Dayjs, Dayjs],
-      },
-      {
+        value: [today.startOf('quarter'), today.endOf('quarter')],
+      }],
+      ['last_quarter', {
         label: t('Last Quarter'),
         value: [
           today.subtract(1, 'quarter').startOf('quarter'),
           today.subtract(1, 'quarter').endOf('quarter'),
-        ] as [Dayjs, Dayjs],
-      },
-      {
+        ],
+      }],
+      ['this_year', {
         label: t('This Year'),
-        value: [today.startOf('year'), today.endOf('year')] as [Dayjs, Dayjs],
-      },
-      {
+        value: [today.startOf('year'), today.endOf('year')],
+      }],
+      ['last_year', {
         label: t('Last Year'),
         value: [
           today.subtract(1, 'year').startOf('year'),
           today.subtract(1, 'year').endOf('year'),
-        ] as [Dayjs, Dayjs],
-      },
-    ];
+        ],
+      }],
+    ]);
   }, []);
+
+  const rangePresets = useMemo(() => {
+    const { customPresets, enabledPresets } = props.formData || {};
+    
+    // If customize presets is enabled, filter based on enabledPresets
+    if (customPresets && enabledPresets && Array.isArray(enabledPresets)) {
+      return enabledPresets
+        .filter(key => allRangePresets.has(key))
+        .map(key => allRangePresets.get(key)!);
+    }
+    
+    // Otherwise return all presets (old behavior for backward compatibility)
+    return Array.from(allRangePresets.values());
+  }, [allRangePresets, props.formData]);
 
   useEffect(() => {
     if (filterState.value && filterState.value !== NO_TIME_RANGE) {
@@ -232,7 +246,7 @@ export default function DateRangeFilter(props: PluginFilterTimeProps) {
             placeholder={['Start date', 'End date']}
             format="YYYY-MM-DD"
             allowClear
-            presets={props.formData?.disablePresets ? undefined : rangePresets}
+            presets={rangePresets.length > 0 ? rangePresets : undefined}
             onOpenChange={open => {
               setFilterActive(open);
               if (!open) {

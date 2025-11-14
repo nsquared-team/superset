@@ -25,10 +25,27 @@ import {
 } from '@superset-ui/core';
 import { PluginFilterHooks, PluginFilterStylesProps } from '../types';
 
+export type DateRangePresetKey = 
+  | 'today'
+  | 'yesterday'
+  | 'last_7_days'
+  | 'last_14_days'
+  | 'last_28_days'
+  | 'last_30_days'
+  | 'this_week'
+  | 'last_week'
+  | 'this_month'
+  | 'last_month'
+  | 'this_quarter'
+  | 'last_quarter'
+  | 'this_year'
+  | 'last_year';
+
 interface PluginFilterTimeCustomizeProps {
   defaultValue?: string | null;
   singleDate?: boolean;
-  disablePresets?: boolean;
+  customPresets?: boolean;
+  enabledPresets?: DateRangePresetKey[];
 }
 
 export type PluginFilterSelectQueryFormData = QueryFormData &
@@ -44,8 +61,26 @@ export type PluginFilterTimeProps = PluginFilterStylesProps & {
   isOverflowingFilterBar?: boolean;
 } & PluginFilterHooks;
 
+export const ALL_DATE_RANGE_PRESETS: DateRangePresetKey[] = [
+  'today',
+  'yesterday',
+  'last_7_days',
+  'last_14_days',
+  'last_28_days',
+  'last_30_days',
+  'this_week',
+  'last_week',
+  'this_month',
+  'last_month',
+  'this_quarter',
+  'last_quarter',
+  'this_year',
+  'last_year',
+];
+
 export const DEFAULT_FORM_DATA: PluginFilterTimeCustomizeProps = {
   defaultValue: null,
   singleDate: false,
-  disablePresets: false,
+  customPresets: false,
+  enabledPresets: ALL_DATE_RANGE_PRESETS,
 };
