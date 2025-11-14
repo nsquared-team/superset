@@ -25,8 +25,7 @@ const StyledRadioGroup = styled(Radio.Group)<{
   flex-wrap: ${({ orientation }) =>
     orientation === FilterBarOrientation.Horizontal ? 'wrap' : 'nowrap'};
   gap: 8px;
-  width: fit-content;
-  
+  width: 100%;
   .ant-radio-wrapper {
     margin: 0;
   }
