@@ -8,13 +8,13 @@ import {
   t,
   styled,
 } from '@superset-ui/core';
-import { FormItem, Checkbox } from '@superset-ui/core/components';
+import { FormItem, Radio } from '@superset-ui/core/components';
 import { FilterBarOrientation } from 'src/dashboard/types';
 import { getDataRecordFormatter, getSelectExtraFormData } from '../../utils';
 import { FilterPluginStyle, StatusMessage } from '../common';
 import { PluginFilterRadioButtonProps, RadioButtonValue } from './types';
 
-const StyledCheckboxGroup = styled(Checkbox.Group)<{
+const StyledRadioGroup = styled(Radio.Group)<{
   inverseSelection: boolean;
   appSection: AppSection;
   orientation?: FilterBarOrientation;
@@ -25,9 +25,9 @@ const StyledCheckboxGroup = styled(Checkbox.Group)<{
   flex-wrap: ${({ orientation }) =>
     orientation === FilterBarOrientation.Horizontal ? 'wrap' : 'nowrap'};
   gap: 8px;
-  width: 100%;
-
-  .ant-checkbox-wrapper {
+  width: fit-content;
+  
+  .ant-radio-wrapper {
     margin: 0;
   }
 `;
@@ -74,29 +74,26 @@ export default function PluginFilterRadioButton(props: PluginFilterRadioButtonPr
     appSection === AppSection.FilterConfigModal && defaultToFirstItem;
 
   const updateDataMask = useCallback(
-    (values: RadioButtonValue) => {
+    (value: RadioButtonValue) => {
       const emptyFilter =
-        enableEmptyFilter && !inverseSelection && !values?.length;
+        enableEmptyFilter && !inverseSelection && value == null;
 
-      const suffix = inverseSelection && values?.length ? t(' (excluded)') : '';
+      const suffix = inverseSelection && value != null ? t(' (excluded)') : '';
 
       setDataMask({
         extraFormData: getSelectExtraFormData(
           col,
-          values,
+          value != null ? [value as string | number | boolean | null] : null,
           emptyFilter,
           excludeFilterValues && inverseSelection,
         ),
         filterState: {
-          label: values?.length
-            ? `${values
-                .map(value => labelFormatter(value, datatype))
-                .join(', ')}${suffix}`
+          label: value != null ? `${labelFormatter(value, datatype)}${suffix}`
             : undefined,
           value:
             appSection === AppSection.FilterConfigModal && defaultToFirstItem
               ? undefined
-              : values,
+              : value,
           excludeFilterValues,
         },
       });
@@ -115,9 +112,9 @@ export default function PluginFilterRadioButton(props: PluginFilterRadioButtonPr
   );
 
   const handleChange = useCallback(
-    (selectedValues: unknown[]) => {
-      const values = selectedValues as RadioButtonValue;
-      updateDataMask(values?.length ? values : null);
+    (e: any) => {
+      const value = e.target.value as RadioButtonValue;
+      updateDataMask(value);
     },
     [updateDataMask],
   );
@@ -163,10 +160,8 @@ export default function PluginFilterRadioButton(props: PluginFilterRadioButtonPr
     }
 
     if (defaultToFirstItem && data[0]) {
-      const firstItem: RadioButtonValue = groupby.map(
-        col => data[0][col],
-      ) as string[];
-      if (firstItem?.[0] !== undefined) {
+      const firstItem = data[0][col];
+      if (firstItem !== undefined) {
         updateDataMask(firstItem);
       }
     } else if (formData?.defaultValue) {
@@ -193,20 +188,20 @@ export default function PluginFilterRadioButton(props: PluginFilterRadioButtonPr
           onBlur={unsetFocusedFilter}
           ref={inputRef}
         >
-          <StyledCheckboxGroup
+          <StyledRadioGroup
             appSection={appSection}
             inverseSelection={inverseSelection}
             orientation={filterBarOrientation}
-            value={(filterState.value as RadioButtonValue) || []}
+            value={filterState.value as RadioButtonValue}
             disabled={isDisabled || isRefreshing}
             onChange={handleChange}
           >
             {sortedOptions.map(option => (
-              <Checkbox key={option.value} value={option.value}>
+              <Radio key={option.value} value={option.value}>
                 {option.label}
-              </Checkbox>
+              </Radio>
             ))}
-          </StyledCheckboxGroup>
+          </StyledRadioGroup>
         </div>
       </FormItem>
     </FilterPluginStyle>

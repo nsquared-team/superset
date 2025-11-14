@@ -11,7 +11,7 @@ import { RefObject } from 'react';
 import { FilterBarOrientation } from 'src/dashboard/types';
 import { PluginFilterHooks, PluginFilterStylesProps } from '../types';
 
-export type RadioButtonValue = (number | string | null)[] | null | undefined;
+export type RadioButtonValue = number | string | boolean | bigint | Date | null | undefined;
 
 export interface PluginFilterRadioButtonCustomizeProps {
   defaultValue?: RadioButtonValue;
