@@ -19,16 +19,14 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { styled, t, useTheme, css } from '@superset-ui/core';
+import { styled, t, css } from '@superset-ui/core';
 import { MenuProps } from '@superset-ui/core/components/Menu';
 import { FilterBarOrientation, RootState } from 'src/dashboard/types';
 import {
-  saveFilterBarOrientation,
   saveCrossFiltersSetting,
 } from 'src/dashboard/actions/dashboardInfo';
 import { Icons } from '@superset-ui/core/components/Icons';
 import { Button, Checkbox, Dropdown } from '@superset-ui/core/components';
-import { Space } from '@superset-ui/core/components/Space';
 import { clearDataMaskState } from 'src/dataMask/actions';
 import { useFilters } from 'src/dashboard/components/nativeFilters/FilterBar/state';
 import { useFilterConfigModal } from 'src/dashboard/components/nativeFilters/FilterBar/FilterConfigurationLink/useFilterConfigModal';
@@ -51,20 +49,11 @@ const CROSS_FILTERS_MENU_KEY = 'cross-filters-menu-key';
 const CROSS_FILTERS_SCOPING_MENU_KEY = 'cross-filters-scoping-menu-key';
 const ADD_EDIT_FILTERS_MENU_KEY = 'add-edit-filters-menu-key';
 
-const isOrientation = (o: SelectedKey): o is FilterBarOrientation =>
-  o === FilterBarOrientation.Vertical || o === FilterBarOrientation.Horizontal;
-
 const FilterBarSettings = () => {
-  const theme = useTheme();
   const dispatch = useDispatch();
   const isCrossFiltersEnabled = useSelector<RootState, boolean>(
     ({ dashboardInfo }) => dashboardInfo.crossFiltersEnabled,
   );
-  const filterBarOrientation = useSelector<RootState, FilterBarOrientation>(
-    ({ dashboardInfo }) => dashboardInfo.filterBarOrientation,
-  );
-  const [selectedFilterBarOrientation, setSelectedFilterBarOrientation] =
-    useState(filterBarOrientation);
 
   const [crossFiltersEnabled, setCrossFiltersEnabled] = useState<boolean>(
     isCrossFiltersEnabled,
@@ -101,24 +90,6 @@ const FilterBarSettings = () => {
     updateCrossFiltersSetting(!crossFiltersEnabled);
   }, [crossFiltersEnabled, updateCrossFiltersSetting]);
 
-  const toggleFilterBarOrientation = useCallback(
-    async (orientation: FilterBarOrientation) => {
-      if (orientation === filterBarOrientation) {
-        return;
-      }
-      // set displayed selection in local state for immediate visual response after clicking
-      setSelectedFilterBarOrientation(orientation);
-      try {
-        // save selection in Redux and backend
-        await dispatch(saveFilterBarOrientation(orientation));
-      } catch {
-        // revert local state in case of error when saving
-        setSelectedFilterBarOrientation(filterBarOrientation);
-      }
-    },
-    [dispatch, filterBarOrientation],
-  );
-
   const handleClick = useCallback(
     (
       selection: Parameters<
@@ -128,8 +99,6 @@ const FilterBarSettings = () => {
       const selectedKey: SelectedKey = selection.key;
       if (selectedKey === CROSS_FILTERS_MENU_KEY) {
         toggleCrossFiltering();
-      } else if (isOrientation(selectedKey)) {
-        toggleFilterBarOrientation(selectedKey);
       } else if (selectedKey === CROSS_FILTERS_SCOPING_MENU_KEY) {
         openScopingModal();
       } else if (selectedKey === ADD_EDIT_FILTERS_MENU_KEY) {
@@ -139,7 +108,6 @@ const FilterBarSettings = () => {
     [
       openScopingModal,
       toggleCrossFiltering,
-      toggleFilterBarOrientation,
       openFilterConfigModal,
     ],
   );
@@ -184,53 +152,9 @@ const FilterBarSettings = () => {
         key: CROSS_FILTERS_SCOPING_MENU_KEY,
         label: t('Cross-filtering scoping'),
       });
-      items.push({ type: 'divider' });
-    }
-    if (canEdit) {
-      items.push({
-        key: 'placement',
-        label: t('Orientation of filter bar'),
-        className: 'filter-bar-orientation-submenu',
-        children: [
-          {
-            key: FilterBarOrientation.Vertical,
-            label: (
-              <Space>
-                {t('Vertical (Left)')}
-                {selectedFilterBarOrientation ===
-                  FilterBarOrientation.Vertical && (
-                  <Icons.CheckOutlined
-                    iconColor={theme.colorPrimary}
-                    iconSize="m"
-                  />
-                )}
-              </Space>
-            ),
-          },
-          {
-            key: FilterBarOrientation.Horizontal,
-            label: (
-              <Space>
-                {t('Horizontal (Top)')}
-                {selectedFilterBarOrientation ===
-                  FilterBarOrientation.Horizontal && (
-                  <Icons.CheckOutlined
-                    iconSize="m"
-                    css={css`
-                      vertical-align: middle;
-                    `}
-                  />
-                )}
-              </Space>
-            ),
-          },
-        ],
-        ...{ 'data-test': 'dropdown-selectable-icon-submenu' },
-      });
     }
     return items;
   }, [
-    selectedFilterBarOrientation,
     canEdit,
     crossFiltersMenuItem,
     dashboardId,
@@ -247,7 +171,7 @@ const FilterBarSettings = () => {
         menu={{
           onClick: handleClick,
           items: menuItems,
-          selectedKeys: [selectedFilterBarOrientation],
+          selectedKeys: [],
         }}
         trigger={['click']}
         popupRender={menu => (
