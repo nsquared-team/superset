@@ -277,8 +277,7 @@ export const hydrateDashboard =
             flash_messages: common?.flash_messages,
             conf: common?.conf,
           },
-          filterBarOrientation:
-            metadata.filter_bar_orientation || FilterBarOrientation.Vertical,
+          filterBarOrientation: FilterBarOrientation.Horizontal,
           crossFiltersEnabled,
         },
         dataMask,

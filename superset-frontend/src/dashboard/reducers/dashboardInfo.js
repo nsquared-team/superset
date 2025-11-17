@@ -25,6 +25,7 @@ import {
   SET_DASHBOARD_THEME,
 } from '../actions/dashboardInfo';
 import { HYDRATE_DASHBOARD } from '../actions/hydrate';
+import { FilterBarOrientation } from '../types';
 
 export default function dashboardStateReducer(state = {}, action) {
   switch (action.type) {
@@ -54,7 +55,7 @@ export default function dashboardStateReducer(state = {}, action) {
     case SET_FILTER_BAR_ORIENTATION:
       return {
         ...state,
-        filterBarOrientation: action.filterBarOrientation,
+        filterBarOrientation: FilterBarOrientation.Horizontal,
       };
     case SET_CROSS_FILTERS_ENABLED:
       return {
