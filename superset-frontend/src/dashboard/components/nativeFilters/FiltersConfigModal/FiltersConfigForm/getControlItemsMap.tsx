@@ -22,6 +22,7 @@ import {
   Checkbox,
   FormItem,
   InfoTooltip,
+  Select,
   Tooltip,
   type FormInstance,
 } from '@superset-ui/core/components';
@@ -227,6 +228,95 @@ export default function getControlItemsMap({
       );
       mapControlItems[controlItem.name] = { element, checked: initialValue };
     });
+
+  controlItems
+    .filter(
+      (controlItem: CustomControlItem) =>
+        controlItem?.config?.type === 'SelectControl' &&
+        controlItem?.config?.renderTrigger,
+    )
+    .forEach(controlItem => {
+      const initialValue =
+        filterToEdit?.controlValues[controlItem.name] ??
+        controlItem?.config?.default;
+      const { choices, multi, mode, visibility } = controlItem.config;
+      
+      const options = choices?.map((choice: [string, string]) => ({
+        label: choice[1],
+        value: choice[0],
+      })) || [];
+
+      const controlValuesPath = ['filters', filterId, 'controlValues'];
+      const customPresetsPath = [...controlValuesPath, 'customPresets'];
+
+      const element = (
+        <FormItem
+          noStyle
+          shouldUpdate={(prev: any, curr: any) =>
+            prev.filters[filterId].controlValues.customPresets !== curr.filters[filterId].controlValues.customPresets
+          }
+        >
+          {({ getFieldValue }) => {
+            if (visibility) {
+              const controlValues = formFilter?.controlValues || {};
+              const filterControlValues = filterToEdit?.controlValues || {};
+              const customPresetsValue = getFieldValue(customPresetsPath) ?? false;
+              
+              const controls = controlItems.reduce(
+                (acc, item) => {
+                  const value =
+                    item.name === 'customPresets'
+                      ? customPresetsValue
+                      : controlValues[item.name] ??
+                        filterControlValues[item.name] ??
+                        item.config?.default;
+                  acc[item.name] = { value };
+                  return acc;
+                },
+                {} as Record<string, { value: any }>,
+              );
+
+              if (!visibility({ controls } as any, {} as any)) {
+                return null;
+              }
+            }
+
+            return (
+              <StyledRowFormItem
+                expanded={expanded}
+                key={controlItem.name}
+                name={[...controlValuesPath, controlItem.name]}
+                initialValue={initialValue}
+                label={
+                  <StyledLabel>
+                    {controlItem.config.label}
+                    {controlItem.config.description && (
+                      <InfoTooltip
+                        placement="top"
+                        tooltip={controlItem.config.description}
+                      />
+                    )}
+                  </StyledLabel>
+                }
+                colon={false}
+              >
+                <Select
+                  mode={multi || mode === 'multiple' ? 'multiple' : undefined}
+                  options={options}
+                  allowClear={controlItem.config.clearable !== false}
+                  onChange={() => {
+                    formChanged();
+                    forceUpdate();
+                  }}
+                />
+              </StyledRowFormItem>
+            );
+          }}
+        </FormItem>
+      );
+      mapControlItems[controlItem.name] = { element, checked: !!initialValue };
+    });
+
   return {
     controlItems: mapControlItems,
     mainControlItems: mapMainControlItems,
