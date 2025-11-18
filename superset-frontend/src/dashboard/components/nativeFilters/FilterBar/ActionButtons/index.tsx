@@ -125,16 +125,18 @@ const ActionButtons = ({
       width={width}
       data-test="filterbar-action-buttons"
     >
-      <Button
-        disabled={isApplyDisabled}
-        buttonStyle="primary"
-        htmlType="submit"
-        className="filter-apply-button"
-        onClick={onApply}
-        {...getFilterBarTestId('apply-button')}
-      >
-        {isVertical ? t('Apply filters') : t('Apply')}
-      </Button>
+      {!isApplyDisabled && (
+        <Button
+          disabled={isApplyDisabled}
+          buttonStyle="primary"
+          htmlType="submit"
+          className="filter-apply-button"
+          onClick={onApply}
+          {...getFilterBarTestId('apply-button')}
+        >
+          {isVertical ? t('Apply filters') : t('Apply')}
+        </Button>
+      )}
       <Button
         disabled={!isClearAllEnabled}
         buttonStyle="link"
