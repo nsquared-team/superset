@@ -162,14 +162,14 @@ export default function DateRangeFilter(props: PluginFilterTimeProps) {
 
   const rangePresets = useMemo(() => {
     const { customPresets, enabledPresets } = props.formData || {};
-
+    
     // If customize presets is enabled, filter based on enabledPresets
     if (customPresets && enabledPresets && Array.isArray(enabledPresets)) {
       return enabledPresets
         .filter(key => allRangePresets.has(key))
         .map(key => allRangePresets.get(key)!);
     }
-
+    
     // Otherwise return all presets (old behavior for backward compatibility)
     return Array.from(allRangePresets.values());
   }, [allRangePresets, props.formData]);

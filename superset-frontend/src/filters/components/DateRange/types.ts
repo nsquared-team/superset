@@ -25,7 +25,7 @@ import {
 } from '@superset-ui/core';
 import { PluginFilterHooks, PluginFilterStylesProps } from '../types';
 
-export type DateRangePresetKey =
+export type DateRangePresetKey = 
   | 'today'
   | 'yesterday'
   | 'last_7_days'

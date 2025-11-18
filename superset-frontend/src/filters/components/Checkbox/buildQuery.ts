@@ -5,7 +5,7 @@ export default function buildQuery(
   formData: PluginFilterCheckboxQueryFormData,
 ) {
   const { sortAscending, sortMetric } = { ...DEFAULT_FORM_DATA, ...formData };
-
+  
   return buildQueryContext(formData, baseQueryObject => {
     const { columns = [] } = baseQueryObject;
     const hasOrdering = sortMetric || sortAscending !== undefined;

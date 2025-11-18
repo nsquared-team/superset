@@ -240,7 +240,7 @@ export default function getControlItemsMap({
         filterToEdit?.controlValues[controlItem.name] ??
         controlItem?.config?.default;
       const { choices, multi, mode, visibility } = controlItem.config;
-
+      
       const options = choices?.map((choice: [string, string]) => ({
         label: choice[1],
         value: choice[0],
@@ -261,7 +261,7 @@ export default function getControlItemsMap({
               const controlValues = formFilter?.controlValues || {};
               const filterControlValues = filterToEdit?.controlValues || {};
               const customPresetsValue = getFieldValue(customPresetsPath) ?? false;
-
+              
               const controls = controlItems.reduce(
                 (acc, item) => {
                   const value =
