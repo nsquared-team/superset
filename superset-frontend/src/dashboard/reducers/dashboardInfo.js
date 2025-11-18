@@ -25,7 +25,6 @@ import {
   SET_DASHBOARD_THEME,
 } from '../actions/dashboardInfo';
 import { HYDRATE_DASHBOARD } from '../actions/hydrate';
-import { FilterBarOrientation } from '../types';
 
 export default function dashboardStateReducer(state = {}, action) {
   switch (action.type) {
