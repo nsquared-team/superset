@@ -102,7 +102,7 @@ export const saveChartConfiguration =
 export const SET_FILTER_BAR_ORIENTATION = 'SET_FILTER_BAR_ORIENTATION';
 
 export function setFilterBarOrientation(
-  filterBarOrientation: FilterBarOrientation.Horizontal,
+  filterBarOrientation: FilterBarOrientation,
 ) {
   return { type: SET_FILTER_BAR_ORIENTATION, filterBarOrientation };
 }

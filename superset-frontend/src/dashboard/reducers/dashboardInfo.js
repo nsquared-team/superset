@@ -55,7 +55,7 @@ export default function dashboardStateReducer(state = {}, action) {
     case SET_FILTER_BAR_ORIENTATION:
       return {
         ...state,
-        filterBarOrientation: FilterBarOrientation.Horizontal,
+        filterBarOrientation: action.filterBarOrientation,
       };
     case SET_CROSS_FILTERS_ENABLED:
       return {
