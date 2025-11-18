@@ -19,7 +19,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { styled, t, css } from '@superset-ui/core';
+import { styled, t, useTheme, css } from '@superset-ui/core';
 import { MenuProps } from '@superset-ui/core/components/Menu';
 import { FilterBarOrientation, RootState } from 'src/dashboard/types';
 import {
@@ -28,6 +28,7 @@ import {
 } from 'src/dashboard/actions/dashboardInfo';
 import { Icons } from '@superset-ui/core/components/Icons';
 import { Button, Checkbox, Dropdown } from '@superset-ui/core/components';
+import { Space } from '@superset-ui/core/components/Space';
 import { clearDataMaskState } from 'src/dataMask/actions';
 import { useFilters } from 'src/dashboard/components/nativeFilters/FilterBar/state';
 import { useFilterConfigModal } from 'src/dashboard/components/nativeFilters/FilterBar/FilterConfigurationLink/useFilterConfigModal';
@@ -54,6 +55,7 @@ const isOrientation = (o: SelectedKey): o is FilterBarOrientation =>
   o === FilterBarOrientation.Vertical || o === FilterBarOrientation.Horizontal;
 
 const FilterBarSettings = () => {
+  const theme = useTheme();
   const dispatch = useDispatch();
   const isCrossFiltersEnabled = useSelector<RootState, boolean>(
     ({ dashboardInfo }) => dashboardInfo.crossFiltersEnabled,
@@ -181,6 +183,49 @@ const FilterBarSettings = () => {
       items.push({
         key: CROSS_FILTERS_SCOPING_MENU_KEY,
         label: t('Cross-filtering scoping'),
+      });
+      items.push({ type: 'divider' });
+    }
+    if (canEdit) {
+      items.push({
+        key: 'placement',
+        label: t('Orientation of filter bar'),
+        className: 'filter-bar-orientation-submenu',
+        children: [
+          {
+            key: FilterBarOrientation.Vertical,
+            label: (
+              <Space>
+                {t('Vertical (Left)')}
+                {selectedFilterBarOrientation ===
+                  FilterBarOrientation.Vertical && (
+                  <Icons.CheckOutlined
+                    iconColor={theme.colorPrimary}
+                    iconSize="m"
+                  />
+                )}
+              </Space>
+            ),
+          },
+          {
+            key: FilterBarOrientation.Horizontal,
+            label: (
+              <Space>
+                {t('Horizontal (Top)')}
+                {selectedFilterBarOrientation ===
+                  FilterBarOrientation.Horizontal && (
+                  <Icons.CheckOutlined
+                    iconSize="m"
+                    css={css`
+                      vertical-align: middle;
+                    `}
+                  />
+                )}
+              </Space>
+            ),
+          },
+        ],
+        ...{ 'data-test': 'dropdown-selectable-icon-submenu' },
       });
     }
     return items;
