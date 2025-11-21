@@ -290,7 +290,10 @@ const FilterBar: FC<FiltersBarProps> = ({
   const handleClearAll = useCallback(() => {
     const newClearAllTriggers = { ...clearAllTriggers };
     filtersInScope.filter(isNativeFilter).forEach(filter => {
-      const { id } = filter;
+      const { id, controlValues } = filter;
+      if (controlValues?.enableEmptyFilter) {
+        return;
+      }
       if (dataMaskSelected[id]) {
         setDataMaskSelected(draft => {
           if (draft[id].filterState?.value !== undefined) {

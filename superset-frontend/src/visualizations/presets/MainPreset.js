@@ -79,6 +79,8 @@ import {
   FilterCheckboxPlugin,
   FilterBooleanPlugin,
   TimeDatePickerPlugin,
+  TimeDateRangePlugin,
+  FilterRadioButtonPlugin,
 } from 'src/filters/components';
 import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/plugin-chart-pivot-table';
 import { HandlebarsChartPlugin } from '@superset-ui/plugin-chart-handlebars';
@@ -178,8 +180,10 @@ export default class MainPreset extends Preset {
           key: FilterPlugins.TimeGrain,
         }),
         new TimeDatePickerPlugin().configure({ key: FilterPlugins.DatePicker }),
+        new TimeDateRangePlugin().configure({ key: FilterPlugins.DateRange }),
         new FilterCheckboxPlugin().configure({ key: FilterPlugins.Checkbox }),
         new FilterBooleanPlugin().configure({ key: FilterPlugins.Boolean }),
+        new FilterRadioButtonPlugin().configure({ key: FilterPlugins.RadioButton }),
         new EchartsTreeChartPlugin().configure({ key: VizType.Tree }),
         new EchartsSunburstChartPlugin().configure({ key: VizType.Sunburst }),
         new HandlebarsChartPlugin().configure({ key: VizType.Handlebars }),
